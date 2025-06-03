@@ -19,19 +19,17 @@ export default function CreateLobbyPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [type, setType] = useState<'rank' | 'custom'>('rank')
+  const [roomId, setRoomId] = useState('') // ルームID用の状態
   const [canCreate, setCanCreate] = useState(true)
 
-  // ロード中は何も表示しない
   if (status === 'loading') {
     return <div>Loading...</div>
   }
 
-  // ユーザー情報がない場合の処理
   if (!session?.user) {
     return <div>ログインしてください</div>
   }
 
-  // UIDをsession.userから適切に取得
   const uid = session.user.email || session.user.name || 'default-id'
 
   useEffect(() => {
@@ -56,11 +54,11 @@ export default function CreateLobbyPage() {
       title,
       description,
       type,
+      roomId, // 入力されたルームIDを保存
       createdAt: Timestamp.now(),
       createdBy: { uid, name, avatar },
       participants: [],
       applicants: [],
-      roomId: '',
     })
 
     router.push('/lobbies')
@@ -95,6 +93,12 @@ export default function CreateLobbyPage() {
           <option value="rank">ランク募集</option>
           <option value="custom">カスタム募集</option>
         </select>
+        <input
+          className="border p-2 rounded"
+          placeholder="ルームID"
+          value={roomId}
+          onChange={(e) => setRoomId(e.target.value)}
+        />
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
