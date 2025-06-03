@@ -35,9 +35,6 @@ export default function LobbiesPage() {
   const { data: session } = useSession()  // セッション情報を取得
   const router = useRouter()
 
-  // sessionの中身をコンソールに出力
-  console.log('Session:', session);  // ここで session の内容を確認
-
   // uid の取得方法を session.user.id に変更
   const uid = (session?.user as any)?.id || 'unknown-id'
 
@@ -89,7 +86,7 @@ export default function LobbiesPage() {
   }
 
   const handleChangeRoomId = async (lobbyId: string) => {
-    // 作成者チェック
+    if (!session?.user) return alert('ログインが必要です')  // ログイン確認
     const isOwner = lobbies.find(lobby => lobby.id === lobbyId)?.createdBy.uid === uid
     if (!isOwner) return alert('あなたはこのロビーの作成者ではありません')  // 作成者でないと実行できないように
 
@@ -114,6 +111,16 @@ export default function LobbiesPage() {
   }
 
   const handleDelete = async (lobbyId: string) => {
+    if (!session?.user) return alert('ログインが必要です')  // ログイン確認
+    const lobbyRef = doc(db, 'lobbies', lobbyId)
+    const lobbySnap = await getDoc(lobbyRef)
+    const lobbyData = lobbySnap.data()
+
+    // 作成者のみ削除可能
+    if (lobbyData?.createdBy.uid !== uid) {
+      return alert('あなたはこのロビーの作成者ではないため削除できません')  // 作成者でないと削除できない
+    }
+
     const confirmDelete = confirm('本当にこの募集を削除しますか？')
     if (!confirmDelete) return
     await deleteDoc(doc(db, 'lobbies', lobbyId))
@@ -192,12 +199,13 @@ export default function LobbiesPage() {
                         </div>
                       </div>
                     )}
-                    {/* ルームID変更ボタンは作成者のみ表示 */}
                     <button className="mt-2 bg-blue-600 text-white px-2 py-1 rounded" onClick={() => handleChangeRoomId(lobby.id)}>
                       ルームID変更
                     </button>
                     {lobby.roomId && <p className="mt-1 text-sm text-gray-800">現在のルームID: {lobby.roomId}</p>}
-                    <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>募集削除</button>
+                    <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>
+                      募集削除
+                    </button>
                   </>
                 )}
 
