@@ -35,7 +35,6 @@ export default function LobbiesPage() {
   const { data: session } = useSession()  // セッション情報を取得
   const router = useRouter()
 
-  // emailを使って管理者判定
   const isAdmin = session?.user?.email === 'levelitisibari@gmail.com'
 
   useEffect(() => {
@@ -64,12 +63,10 @@ export default function LobbiesPage() {
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
-    // 既に参加しているか確認
     if (lobbyData?.participants.some((p: any) => p.uid === uid)) {
       return alert('すでに参加しています')
     }
 
-    // 参加申請無しで即参加
     await updateDoc(lobbyRef, {
       participants: arrayUnion(user),
     })
@@ -96,7 +93,6 @@ export default function LobbiesPage() {
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
-    // 作成者のみ削除可能
     if (lobbyData?.createdBy.uid !== uid) {
       return alert('あなたはこのロビーの作成者ではないため削除できません')
     }
@@ -160,11 +156,9 @@ export default function LobbiesPage() {
 
                 {/* 作成者のみ操作 */}
                 {isOwner && (
-                  <>
-                    <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>
-                      募集削除
-                    </button>
-                  </>
+                  <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>
+                    募集削除
+                  </button>
                 )}
 
                 {/* 一般ユーザーの操作 */}

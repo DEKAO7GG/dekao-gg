@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { db } from '../../firebaseConfig'
-import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore'
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+} from 'firebase/firestore'
 
 export default function CreateLobbyPage() {
   const { data: session, status } = useSession()
@@ -14,17 +21,14 @@ export default function CreateLobbyPage() {
   const [type, setType] = useState<'rank' | 'custom'>('rank')
   const [canCreate, setCanCreate] = useState(true)
 
-  // ロード中は何も表示しない
   if (status === 'loading') {
     return <div>Loading...</div>
   }
 
-  // ユーザー情報がない場合の処理
   if (!session?.user) {
     return <div>ログインしてください</div>
   }
 
-  // UIDをsession.userから適切に取得
   const uid = session.user.email || session.user.name || 'default-id'
 
   useEffect(() => {
