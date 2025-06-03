@@ -39,7 +39,7 @@ export default function LobbiesPage() {
   console.log('Session:', session);  // ここで session の内容を確認
 
   // uid の取得方法を session.user.id に変更
-  const uid = (session?.user as any)?.id || 'unknown-id'
+  const uid = (session?.user as any)?.id || (session?.user as any)?.sub || 'unknown-id'
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'lobbies'), (snapshot) => {
