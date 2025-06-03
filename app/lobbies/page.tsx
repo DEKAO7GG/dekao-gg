@@ -35,11 +35,8 @@ export default function LobbiesPage() {
   const { data: session } = useSession()  // セッション情報を取得
   const router = useRouter()
 
-  // sessionの中身をコンソールに出力
-  console.log('Session:', session);  // ここで session の内容を確認
-
-  // uid の取得方法を session.user.id に変更
-  const uid = (session?.user as any)?.id || (session?.user as any)?.sub || 'unknown-id'
+  // emailを使って管理者判定
+  const isAdmin = session?.user?.email === 'levelitisibari@gmail.com'
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'lobbies'), (snapshot) => {
@@ -49,11 +46,14 @@ export default function LobbiesPage() {
       })) as Lobby[]
       setLobbies(fetched)
     })
-    return () => unsub()
+    return () => unsub()  // クリーンアップ
   }, [])
+
+  const uid = session?.user?.email || 'unknown-id'  // emailをUIDとして使う
 
   const handleApply = async (lobbyId: string) => {
     if (!session?.user) return alert('ログインが必要です')
+
     const user = {
       uid,
       name: session.user.name || 'NoName',
@@ -64,7 +64,6 @@ export default function LobbiesPage() {
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
-    // 既に参加しているか確認
     if (lobbyData?.participants.some((p: any) => p.uid === uid)) {
       return alert('すでに参加しています')
     }
@@ -89,9 +88,9 @@ export default function LobbiesPage() {
   }
 
   const handleChangeRoomId = async (lobbyId: string) => {
-    if (!session?.user) return alert('ログインが必要です')  // ログイン確認
-    const isOwner = lobbies.find(lobby => lobby.id === lobbyId)?.createdBy.uid === uid
-    if (!isOwner) return alert('あなたはこのロビーの作成者ではありません')  // 作成者でないと実行できないように
+    if (!session?.user) return alert('ログインが必要です')
+    const isOwner = lobbies.find((lobby) => lobby.id === lobbyId)?.createdBy.uid === uid
+    if (!isOwner) return alert('あなたはこのロビーの作成者ではありません')
 
     const newRoomId = prompt('新しいルームIDを入力')
     if (!newRoomId) return
@@ -103,33 +102,34 @@ export default function LobbiesPage() {
 
   const handleLeave = async (lobbyId: string) => {
     if (!session?.user) return alert('ログインが必要です')
+
     const user = {
       uid,
       name: session.user.name || 'NoName',
       avatar: session.user.image || '',
     }
+
     await updateDoc(doc(db, 'lobbies', lobbyId), {
       participants: arrayRemove(user),
     })
   }
 
   const handleDelete = async (lobbyId: string) => {
-    if (!session?.user) return alert('ログインが必要です')  // ログイン確認
+    if (!session?.user) return alert('ログインが必要です')
+
     const lobbyRef = doc(db, 'lobbies', lobbyId)
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
     // 作成者のみ削除可能
     if (lobbyData?.createdBy.uid !== uid) {
-      return alert('あなたはこのロビーの作成者ではないため削除できません')  // 作成者でないと削除できないように
+      return alert('あなたはこのロビーの作成者ではないため削除できません')
     }
 
     const confirmDelete = confirm('本当にこの募集を削除しますか？')
     if (!confirmDelete) return
     await deleteDoc(doc(db, 'lobbies', lobbyId))
   }
-
-  const isAdmin = (session?.user as any)?.email === 'levelitisibari@gmail.com'
 
   return (
     <div className="p-6 max-w-xl mx-auto">

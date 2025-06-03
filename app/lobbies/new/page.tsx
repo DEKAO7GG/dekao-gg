@@ -21,8 +21,8 @@ export default function CreateLobbyPage() {
   const [type, setType] = useState<'rank' | 'custom'>('rank')
   const [canCreate, setCanCreate] = useState(true)
 
-  // uidをsession.userから適切に取得
-  const uid = (session?.user as any)?.id || (session?.user as any)?.sub || 'unknown-id'
+  // UIDをsession.userのemailまたはnameを使って設定
+  const uid = session?.user?.email || session?.user?.name || 'default-id'
 
   useEffect(() => {
     const checkLobbyLimit = async () => {
