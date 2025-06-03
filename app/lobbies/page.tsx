@@ -32,8 +32,11 @@ type Lobby = {
 
 export default function LobbiesPage() {
   const [lobbies, setLobbies] = useState<Lobby[]>([])
-  const { data: session } = useSession()
+  const { data: session } = useSession()  // セッション情報を取得
   const router = useRouter()
+
+  // sessionの中身をコンソールに出力
+  console.log('Session:', session);  // ここで session の内容を確認
 
   // uid の取得方法を session.user.id に変更
   const uid = (session?.user as any)?.id || 'unknown-id'
