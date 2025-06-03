@@ -19,7 +19,7 @@ export default function CreateLobbyPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [type, setType] = useState<'rank' | 'custom'>('rank')
-  const [roomId, setRoomId] = useState('') // ルームID用の状態
+  const [roomId, setRoomId] = useState('') // ルームIDの状態
   const [canCreate, setCanCreate] = useState(true)
 
   if (status === 'loading') {
@@ -54,7 +54,7 @@ export default function CreateLobbyPage() {
       title,
       description,
       type,
-      roomId, // 入力されたルームIDを保存
+      roomId, // ルームIDを保存
       createdAt: Timestamp.now(),
       createdBy: { uid, name, avatar },
       participants: [],
@@ -93,11 +93,12 @@ export default function CreateLobbyPage() {
           <option value="rank">ランク募集</option>
           <option value="custom">カスタム募集</option>
         </select>
+        {/* ルームID入力フィールド追加 */}
         <input
           className="border p-2 rounded"
-          placeholder="ルームID"
+          placeholder="ルームIDを入力"
           value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
+          onChange={(e) => setRoomId(e.target.value)} // 入力された値を更新
         />
         <button
           type="submit"
