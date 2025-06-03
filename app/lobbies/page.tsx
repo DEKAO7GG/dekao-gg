@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { getDocs, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, collection, onSnapshot, getDoc } from 'firebase/firestore'
-import { db } from '../firebaseConfig'
 import { useRouter } from 'next/navigation'
+import { db } from '../firebaseConfig'
+import { getDocs, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, collection, onSnapshot, getDoc } from 'firebase/firestore'
 
 type Lobby = {
   id: string
