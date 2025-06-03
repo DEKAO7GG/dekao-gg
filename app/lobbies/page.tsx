@@ -170,11 +170,9 @@ export default function LobbiesPage() {
                   )
                 )}
 
-                {/* ルームID表示 */}
-                <div className="mt-2">
-                  <strong>ルームID:</strong> 
-                  <span>{lobby.roomId || '未設定'}</span>
-                </div>
+                {!isOwner && isJoined && lobby.roomId && (
+                  <p className="mt-2 text-sm text-green-700">ルームID: {lobby.roomId}</p>
+                )}
               </li>
             )
           })}
