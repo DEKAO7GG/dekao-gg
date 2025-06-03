@@ -89,10 +89,13 @@ export default function LobbiesPage() {
   }
 
   const handleChangeRoomId = async (lobbyId: string) => {
+    // 作成者チェック
     const isOwner = lobbies.find(lobby => lobby.id === lobbyId)?.createdBy.uid === uid
     if (!isOwner) return alert('あなたはこのロビーの作成者ではありません')  // 作成者でないと実行できないように
+
     const newRoomId = prompt('新しいルームIDを入力')
     if (!newRoomId) return
+
     await updateDoc(doc(db, 'lobbies', lobbyId), {
       roomId: newRoomId,
     })
@@ -189,7 +192,10 @@ export default function LobbiesPage() {
                         </div>
                       </div>
                     )}
-                    <button className="mt-2 bg-blue-600 text-white px-2 py-1 rounded" onClick={() => handleChangeRoomId(lobby.id)}>ルームID変更</button>
+                    {/* ルームID変更ボタンは作成者のみ表示 */}
+                    <button className="mt-2 bg-blue-600 text-white px-2 py-1 rounded" onClick={() => handleChangeRoomId(lobby.id)}>
+                      ルームID変更
+                    </button>
                     {lobby.roomId && <p className="mt-1 text-sm text-gray-800">現在のルームID: {lobby.roomId}</p>}
                     <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>募集削除</button>
                   </>
