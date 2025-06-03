@@ -64,39 +64,14 @@ export default function LobbiesPage() {
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
+    // 既に参加しているか確認
     if (lobbyData?.participants.some((p: any) => p.uid === uid)) {
       return alert('すでに参加しています')
     }
 
+    // 参加申請無しで即参加
     await updateDoc(lobbyRef, {
-      applicants: arrayUnion(user),
-    })
-  }
-
-  const handleApprove = async (lobbyId: string, user: any) => {
-    const lobbyRef = doc(db, 'lobbies', lobbyId)
-    await updateDoc(lobbyRef, {
-      applicants: arrayRemove(user),
       participants: arrayUnion(user),
-    })
-  }
-
-  const handleReject = async (lobbyId: string, user: any) => {
-    await updateDoc(doc(db, 'lobbies', lobbyId), {
-      applicants: arrayRemove(user),
-    })
-  }
-
-  const handleChangeRoomId = async (lobbyId: string) => {
-    if (!session?.user) return alert('ログインが必要です')
-    const isOwner = lobbies.find((lobby) => lobby.id === lobbyId)?.createdBy.uid === uid
-    if (!isOwner) return alert('あなたはこのロビーの作成者ではありません')
-
-    const newRoomId = prompt('新しいルームIDを入力')
-    if (!newRoomId) return
-
-    await updateDoc(doc(db, 'lobbies', lobbyId), {
-      roomId: newRoomId,
     })
   }
 
@@ -158,7 +133,6 @@ export default function LobbiesPage() {
           {lobbies.map((lobby) => {
             const isJoined = lobby.participants.some((p) => p.uid === uid)
             const isOwner = lobby.createdBy.uid === uid
-            const isApplicant = lobby.applicants?.some((a) => a.uid === uid)
 
             return (
               <li key={lobby.id} className="border p-4 rounded">
@@ -187,10 +161,6 @@ export default function LobbiesPage() {
                 {/* 作成者のみ操作 */}
                 {isOwner && (
                   <>
-                    <button className="mt-2 bg-blue-600 text-white px-2 py-1 rounded" onClick={() => handleChangeRoomId(lobby.id)}>
-                      ルームID変更
-                    </button>
-                    {lobby.roomId && <p className="mt-1 text-sm text-gray-800">現在のルームID: {lobby.roomId}</p>}
                     <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>
                       募集削除
                     </button>
@@ -201,10 +171,8 @@ export default function LobbiesPage() {
                 {!isOwner && session?.user && (
                   isJoined ? (
                     <button className="mt-2 bg-red-500 text-white px-3 py-1 rounded" onClick={() => handleLeave(lobby.id)}>離脱</button>
-                  ) : isApplicant ? (
-                    <span className="mt-2 inline-block text-yellow-600">申請中</span>
                   ) : (
-                    <button className="mt-2 bg-green-500 text-white px-3 py-1 rounded" onClick={() => handleApply(lobby.id)}>参加申請</button>
+                    <button className="mt-2 bg-green-500 text-white px-3 py-1 rounded" onClick={() => handleApply(lobby.id)}>参加</button>
                   )
                 )}
 
