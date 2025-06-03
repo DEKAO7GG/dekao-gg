@@ -63,12 +63,10 @@ export default function LobbiesPage() {
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
-    // 既に参加しているか確認
     if (lobbyData?.participants.some((p: any) => p.uid === uid)) {
       return alert('すでに参加しています')
     }
 
-    // 参加申請無しで即参加
     await updateDoc(lobbyRef, {
       participants: arrayUnion(user),
     })
@@ -140,9 +138,6 @@ export default function LobbiesPage() {
                 <div className="text-sm mt-2 text-gray-700">
                   {lobby.participants.length} / {lobby.type === 'rank' ? 2 : '∞'}
                 </div>
-                <div className="text-sm mt-2 text-gray-700">
-                  <span className="text-sm text-gray-700">ルームID: {lobby.roomId || '未設定'}</span>
-                </div>
                 <div className="flex items-center gap-2 mt-2">
                   <img src={lobby.createdBy.avatar} alt="" className="w-6 h-6 rounded-full" />
                   <span className="text-sm">{lobby.createdBy.name}</span>
@@ -151,7 +146,7 @@ export default function LobbiesPage() {
                 {lobby.participants.length > 0 && (
                   <div className="flex items-center gap-2 flex-wrap mt-2">
                     {lobby.participants.map((p) => (
-                      <div key={p.uid} className="flex items-center gap-1 border px-2 py-1 rounded bg-blue-100">
+                      <div key={p.uid} className="flex items-center gap-1 border px-2 py-1 rounded bg-gray-100">
                         <img src={p.avatar} alt="" className="w-5 h-5 rounded-full" />
                         <span className="text-sm">{p.name}</span>
                       </div>
@@ -175,9 +170,11 @@ export default function LobbiesPage() {
                   )
                 )}
 
-                {!isOwner && isJoined && lobby.roomId && (
-                  <p className="mt-2 text-sm text-green-700">ルームID: {lobby.roomId}</p>
-                )}
+                {/* ルームID表示 */}
+                <div className="mt-2">
+                  <strong>ルームID:</strong> 
+                  <span>{lobby.roomId || '未設定'}</span>
+                </div>
               </li>
             )
           })}
