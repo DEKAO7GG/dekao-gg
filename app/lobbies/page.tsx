@@ -56,7 +56,6 @@ export default function LobbiesPage() {
       avatar: session.user.image || '',
     }
 
-    // 既に参加していないか確認
     const lobbyRef = doc(db, 'lobbies', lobbyId)
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
@@ -65,7 +64,6 @@ export default function LobbiesPage() {
       return alert('すでに参加しています')
     }
 
-    // 申請者として追加
     await updateDoc(lobbyRef, {
       applicants: arrayUnion(user),
     })
@@ -168,6 +166,7 @@ export default function LobbiesPage() {
                   </div>
                 )}
 
+                {/* 作成者のみ操作 */}
                 {isOwner && (
                   <>
                     {(lobby.applicants?.length ?? 0) > 0 && (
@@ -191,6 +190,7 @@ export default function LobbiesPage() {
                   </>
                 )}
 
+                {/* 一般ユーザーの操作 */}
                 {!isOwner && session?.user && (
                   isJoined ? (
                     <button className="mt-2 bg-red-500 text-white px-3 py-1 rounded" onClick={() => handleLeave(lobby.id)}>離脱</button>
