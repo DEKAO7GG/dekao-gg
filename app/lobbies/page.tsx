@@ -35,6 +35,8 @@ export default function LobbiesPage() {
   const { data: session } = useSession()
   const router = useRouter()
 
+  const uid = (session?.user as any)?.sub || 'unknown-id'
+
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'lobbies'), (snapshot) => {
       const fetched = snapshot.docs.map((doc) => ({
@@ -49,7 +51,7 @@ export default function LobbiesPage() {
   const handleApply = async (lobbyId: string) => {
     if (!session?.user) return alert('ログインが必要です')
     const user = {
-      uid: (session.user as any).sub || 'unknown-id',
+      uid,
       name: session.user.name || 'NoName',
       avatar: session.user.image || '',
     }
@@ -83,7 +85,7 @@ export default function LobbiesPage() {
   const handleLeave = async (lobbyId: string) => {
     if (!session?.user) return alert('ログインが必要です')
     const user = {
-      uid: (session.user as any).sub || 'unknown-id',
+      uid,
       name: session.user.name || 'NoName',
       avatar: session.user.image || '',
     }
@@ -125,7 +127,6 @@ export default function LobbiesPage() {
       ) : (
         <ul className="flex flex-col gap-4">
           {lobbies.map((lobby) => {
-            const uid = (session?.user as any)?.sub || 'unknown-id'
             const isJoined = lobby.participants.some((p) => p.uid === uid)
             const isOwner = lobby.createdBy.uid === uid
             const isApplicant = lobby.applicants?.some((a) => a.uid === uid)
@@ -157,21 +158,20 @@ export default function LobbiesPage() {
                 {isOwner && (
                   <>
                     {(lobby.applicants?.length ?? 0) > 0 && (
-  <div className="mt-2">
-    <p className="text-sm font-bold">申請中:</p>
-    <div className="flex flex-wrap gap-2">
-      {lobby.applicants?.map((a) => (
-        <div key={a.uid} className="flex items-center gap-1 bg-yellow-100 px-2 py-1 rounded">
-          <img src={a.avatar} className="w-5 h-5 rounded-full" />
-          <span className="text-sm">{a.name}</span>
-          <button className="text-green-600" onClick={() => handleApprove(lobby.id, a)}>承認</button>
-          <button className="text-red-600" onClick={() => handleReject(lobby.id, a)}>却下</button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
+                      <div className="mt-2">
+                        <p className="text-sm font-bold">申請中:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {lobby.applicants?.map((a) => (
+                            <div key={a.uid} className="flex items-center gap-1 bg-yellow-100 px-2 py-1 rounded">
+                              <img src={a.avatar} className="w-5 h-5 rounded-full" />
+                              <span className="text-sm">{a.name}</span>
+                              <button className="text-green-600" onClick={() => handleApprove(lobby.id, a)}>承認</button>
+                              <button className="text-red-600" onClick={() => handleReject(lobby.id, a)}>却下</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <button className="mt-2 bg-blue-600 text-white px-2 py-1 rounded" onClick={() => handleChangeRoomId(lobby.id)}>ルームID変更</button>
                     {lobby.roomId && <p className="mt-1 text-sm text-gray-800">現在のルームID: {lobby.roomId}</p>}
                     <button className="mt-2 bg-black text-white px-3 py-1 rounded" onClick={() => handleDelete(lobby.id)}>募集削除</button>
