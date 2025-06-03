@@ -4,14 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { db } from '../../firebaseConfig'
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  Timestamp,
-} from 'firebase/firestore'
+import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore'
 
 export default function CreateLobbyPage() {
   const { data: session, status } = useSession()
