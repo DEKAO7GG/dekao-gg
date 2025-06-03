@@ -121,7 +121,7 @@ export default function LobbiesPage() {
 
     // 作成者のみ削除可能
     if (lobbyData?.createdBy.uid !== uid) {
-      return alert('あなたはこのロビーの作成者ではないため削除できません')  // 作成者でないと削除できない
+      return alert('あなたはこのロビーの作成者ではないため削除できません')  // 作成者でないと削除できないように
     }
 
     const confirmDelete = confirm('本当にこの募集を削除しますか？')
@@ -187,21 +187,6 @@ export default function LobbiesPage() {
                 {/* 作成者のみ操作 */}
                 {isOwner && (
                   <>
-                    {(lobby.applicants?.length ?? 0) > 0 && (
-                      <div className="mt-2">
-                        <p className="text-sm font-bold">申請中:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {lobby.applicants?.map((a) => (
-                            <div key={a.uid} className="flex items-center gap-1 bg-yellow-100 px-2 py-1 rounded">
-                              <img src={a.avatar} className="w-5 h-5 rounded-full" />
-                              <span className="text-sm">{a.name}</span>
-                              <button className="text-green-600" onClick={() => handleApprove(lobby.id, a)}>承認</button>
-                              <button className="text-red-600" onClick={() => handleReject(lobby.id, a)}>却下</button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                     <button className="mt-2 bg-blue-600 text-white px-2 py-1 rounded" onClick={() => handleChangeRoomId(lobby.id)}>
                       ルームID変更
                     </button>
