@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { getDocs, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, collection, onSnapshot } from 'firebase/firestore'
+import { getDocs, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, collection, onSnapshot, getDoc } from 'firebase/firestore'
 import { db } from '../firebaseConfig'
 import { useRouter } from 'next/navigation'
 
@@ -21,12 +21,12 @@ type Lobby = {
     uid: string
     name: string
     avatar: string
-  }[]
+  }[] 
   applicants?: {
     uid: string
     name: string
     avatar: string
-  }[]
+  }[] 
   roomId?: string
 }
 
@@ -55,7 +55,18 @@ export default function LobbiesPage() {
       name: session.user.name || 'NoName',
       avatar: session.user.image || '',
     }
-    await updateDoc(doc(db, 'lobbies', lobbyId), {
+
+    // 既に参加していないか確認
+    const lobbyRef = doc(db, 'lobbies', lobbyId)
+    const lobbySnap = await getDoc(lobbyRef)
+    const lobbyData = lobbySnap.data()
+
+    if (lobbyData?.participants.some((p: any) => p.uid === uid)) {
+      return alert('すでに参加しています')
+    }
+
+    // 申請者として追加
+    await updateDoc(lobbyRef, {
       applicants: arrayUnion(user),
     })
   }
@@ -75,6 +86,8 @@ export default function LobbiesPage() {
   }
 
   const handleChangeRoomId = async (lobbyId: string) => {
+    const isOwner = lobbies.find(lobby => lobby.id === lobbyId)?.createdBy.uid === uid
+    if (!isOwner) return alert('あなたはこのロビーの作成者ではありません')  // 作成者でないと実行できないように
     const newRoomId = prompt('新しいルームIDを入力')
     if (!newRoomId) return
     await updateDoc(doc(db, 'lobbies', lobbyId), {
