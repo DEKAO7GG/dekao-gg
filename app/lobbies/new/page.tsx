@@ -21,23 +21,24 @@ export default function CreateLobbyPage() {
   const [type, setType] = useState<'rank' | 'custom'>('rank')
   const [canCreate, setCanCreate] = useState(true)
 
+  // uidをsession.userから適切に取得
+  const uid = (session?.user as any)?.id || (session?.user as any)?.sub || 'unknown-id'
+
   useEffect(() => {
     const checkLobbyLimit = async () => {
       if (!session?.user) return
-      const uid = (session.user as any).sub || 'unknown-id'
       const q = query(collection(db, 'lobbies'), where('createdBy.uid', '==', uid))
       const snapshot = await getDocs(q)
       if (snapshot.size >= 1) setCanCreate(false)
     }
     checkLobbyLimit()
-  }, [session])
+  }, [session, uid])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!session?.user) return alert('ログインが必要です')
     if (!canCreate) return alert('募集は1つまで作成可能です')
 
-    const uid = (session.user as any).sub || 'unknown-id'
     const name = session.user.name || 'No Name'
     const avatar = session.user.image || ''
 

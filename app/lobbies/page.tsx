@@ -35,7 +35,8 @@ export default function LobbiesPage() {
   const { data: session } = useSession()
   const router = useRouter()
 
-  const uid = (session?.user as any)?.sub || 'unknown-id'
+  // uid の取得方法を session.user.id に変更
+  const uid = (session?.user as any)?.id || 'unknown-id'
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'lobbies'), (snapshot) => {
@@ -60,6 +61,7 @@ export default function LobbiesPage() {
     const lobbySnap = await getDoc(lobbyRef)
     const lobbyData = lobbySnap.data()
 
+    // 既に参加しているか確認
     if (lobbyData?.participants.some((p: any) => p.uid === uid)) {
       return alert('すでに参加しています')
     }
